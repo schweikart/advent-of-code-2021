@@ -7,9 +7,9 @@ instance Show Command where
 main = do
     input <- readFile "input.txt"
     let parsed = parseInput input
-        (endHor1,endDep1) = calculateEndPosition parsed (0,0)
+        (endHor1,endDep1) = calculateEndPositionPartOne parsed
     putStrLn ("Solution to part one: " ++ show (endHor1 * endDep1))
-    let (endHor2, endDep2, _) = calculateEndPosition2 parsed (0,0,0)
+    let (endHor2, endDep2, _) = calculateEndPositionPartTwo parsed
     putStrLn ("Solution to part two: " ++ show (endHor2 * endDep2))
 
 {-|
@@ -24,26 +24,42 @@ parseInput input = map (parseCommand . words) (lines input) where
         | cmd == "up" = Up (read amt)
 
 {-|
-Calculates the position (new horizontal position, new depth) if a submarine starting at (horizontal position, depth) follows all of the given commands.
+Calculates the end position (horizontal position, depth) of the submarine when applying the given set of commands
+using the interpretation of part one of the puzzle.
 
->>> calculateEndPosition [Forward 5, Down 5, Forward 8, Up 3, Down 8, Forward 2] (0,0)
+>>> calculateEndPositionPartOne [Forward 5, Down 5, Forward 8, Up 3, Down 8, Forward 2]
 (15,10)
 -}
-calculateEndPosition :: [Command] -> (Int, Int) -> (Int, Int)
-calculateEndPosition [] (h,d) = (h,d)
-calculateEndPosition ((Forward amt):cmds) (h,d) = calculateEndPosition cmds (h + amt, d)
-calculateEndPosition ((Down amt):cmds) (h,d) = calculateEndPosition cmds (h, d + amt) -- note that "down" increases the depth
-calculateEndPosition ((Up amt):cmds) (h,d) = calculateEndPosition cmds (h, d - amt)
+calculateEndPositionPartOne :: [Command] -> (Int, Int)
+calculateEndPositionPartOne = foldl applyCommandPartOne (0,0) -- partial application of foldr
 
 {-|
-Calculates the position (new horizontal position, new depth, new aim) if a submarine starting at
-    (horizontal position, depth, aim) follows all of the given commands with the part two interpretation.
+Applies the position (horizontal position, depth) update given through a command,
+by the interpretation of part one of the puzzle.
+-}
+applyCommandPartOne :: (Int, Int) -> Command -> (Int, Int)
+applyCommandPartOne (hor,dep) (Forward amt) = (hor + amt, dep)
+applyCommandPartOne (hor,dep) (Down amt)    = (hor,       dep + amt) -- note that "down" increases the depth
+applyCommandPartOne (hor,dep) (Up amt)      = (hor,       dep - amt)
 
->>> calculateEndPosition2 [Forward 5, Down 5, Forward 8, Up 3, Down 8, Forward 2] (0,0,0)
+{-|
+Calculates the end position (horizontal position, depth, aim) of the submarine when applying the given set of commands
+using the interpretation of part two of the puzzle.
+
+>>> calculateEndPositionPartTwo [Forward 5, Down 5, Forward 8, Up 3, Down 8, Forward 2]
 (15,60,10)
 -}
-calculateEndPosition2 :: [Command] -> (Int, Int, Int) -> (Int, Int, Int)
-calculateEndPosition2 [] (hor,dep,aim) = (hor,dep,aim)
-calculateEndPosition2 ((Forward amt):cmds) (hor,dep,aim) = calculateEndPosition2 cmds (hor + amt, dep + aim*amt, aim)
-calculateEndPosition2 ((Down amt):cmds) (hor,dep,aim) = calculateEndPosition2 cmds (hor, dep, aim + amt)
-calculateEndPosition2 ((Up amt):cmds) (hor,dep,aim) = calculateEndPosition2 cmds (hor, dep, aim - amt)
+calculateEndPositionPartTwo :: [Command] -> (Int, Int, Int)
+calculateEndPositionPartTwo = foldl applyCommandPartTwo (0,0,0) -- partial application of foldl
+
+{-|
+Applies the position (horizontal position, depth, aim) update given through a command,
+by the interpretation of part two of the puzzle.
+
+>>> applyCommandPartTwo (5,0,0) (Down 5)
+(5,0,5)
+-}
+applyCommandPartTwo :: (Int, Int, Int) -> Command -> (Int, Int, Int)
+applyCommandPartTwo (hor,dep,aim) (Forward amt) = (hor + amt, dep + aim*amt, aim)
+applyCommandPartTwo (hor,dep,aim) (Down amt)    = (hor,       dep,           aim + amt)
+applyCommandPartTwo (hor,dep,aim) (Up amt)      = (hor,       dep,           aim - amt)
