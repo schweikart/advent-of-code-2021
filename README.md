@@ -12,6 +12,7 @@ To run the solution algorithm with your own puzzle input, just replace the `inpu
 * [`.vscode/tasks.json`](./.vscode/tasks.json): configuration file that allows running my code through VS Code
 * `./dayXX/`: Puzzle input, description and solution code for the XX-th day of the advent calendar
     * [`./day01/`](./day01): Sonar Sweep
+    * [`./day02/`](./day02): Dive!
 * [`.gitignore`](./.gitignore): configuration file that keeps generated files out of the git repo
 * [`README.md`](./README.md): description of and instructions for this repository
 

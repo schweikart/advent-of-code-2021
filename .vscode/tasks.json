@@ -11,6 +11,15 @@
             "options": {
                 "cwd": "${workspaceFolder}/day01"
             }
+        },
+        {
+            "label": "day 02",
+            "type": "shell",
+            "command": "runghc day02",
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}/day02"
+            }
         }
     ]
 }
